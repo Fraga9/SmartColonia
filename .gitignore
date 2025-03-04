@@ -1,0 +1,62 @@
+#venv/
+#FastAPI/__pycache__/
+# Entorno virtual
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+instance/
+
+# Dependencias de Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Archivos de Expo y React Native
+.expo/
+.expo-shared/
+android/.gradle/
+android/app/build/
+android/.cxx/
+ios/Pods/
+ios/build/
+
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
