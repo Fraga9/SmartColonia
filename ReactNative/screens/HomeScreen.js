@@ -37,6 +37,7 @@ const HomeScreen = ({ navigation }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newNotifications, setNewNotifications] = useState(3);
+  const [residencias, setResidencias] = useState([]);
   const ROLE_NAMES = {
     1: 'Administrador',
     2: 'Vigilante',
@@ -66,6 +67,11 @@ const HomeScreen = ({ navigation }) => {
         setTipoUsuarioId(userData.tipo_usuario_id);
         setColoniaId(userData.colonia_id);
         
+        // If user has a colonia, check if they have residencias
+        if (userData.colonia_id) {
+          console.log('User has colonia:', userData.colonia_id);
+          await fetchUserResidencias(user.id);
+      }
         
         // Fetch payments
         fetchPayments(user.id);
@@ -82,7 +88,57 @@ const HomeScreen = ({ navigation }) => {
     if (user) fetchUserData();
   }, [user]);
 
-  // Fetch community announcements
+  // Fetch residencias associated with the user
+const fetchUserResidencias = async (userId) => {
+  try {
+    // Make API call to get user's residencias using Supabase REST API directly
+    const response = await fetch(`https://uammxewwluoirsfdvfmu.supabase.co/rest/v1/residencias_usuarios?usuario_id=eq.${userId}&select=residencia_id`, {
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching residencias: ${response.statusText}`);
+    }
+    
+    const userResidenciasRelations = await response.json();
+    
+    // If no residencias, redirect to the claim screen
+    console.log('User residencias:', userResidenciasRelations);
+    if (userResidenciasRelations.length === 0) {
+      navigation.navigate('ReclamarResidencia');
+      return;
+    }
+    
+    // Extract residencia IDs
+    const residenciaIds = userResidenciasRelations.map(relation => relation.residencia_id);
+    
+    // Fetch the actual residencias data
+    const residenciasPromises = residenciaIds.map(async (id) => {
+      const resResponse = await fetch(`https://uammxewwluoirsfdvfmu.supabase.co/rest/v1/residencias?id=eq.${id}`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!resResponse.ok) {
+        throw new Error(`Error fetching residencia details: ${resResponse.statusText}`);
+      }
+      
+      const residenciaData = await resResponse.json();
+      return residenciaData[0]; // Return the first (and should be only) result
+    });
+    
+    const allResidencias = await Promise.all(residenciasPromises);
+    setResidencias(allResidencias);
+    
+  } catch (error) {
+    console.error('Error fetching user residencias:', error.message);
+  }
+};
 
 
   // Fetch payment information

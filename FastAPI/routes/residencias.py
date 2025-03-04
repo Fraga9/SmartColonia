@@ -51,6 +51,21 @@ async def create_residencia_usuario_route(residencia_usuario_data: ResidenciaUsu
         if isinstance(e, HTTPException):
             raise e
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+    
+
+@router.get("/usuarios/{usuario_id}", response_model=List[Residencia])
+async def get_residencias_by_usuario_route(usuario_id: UUID, db=Depends(get_db)):
+    """Obtiene todas las residencias asociadas a un usuario."""
+    try:
+        residencias = get_residencias_by_usuario(usuario_id, db)
+        return [Residencia(**residencia) for residencia in residencias]
+    except Exception as e:
+        logger.error(f"Error al obtener residencias del usuario: {str(e)}")
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+
 
 @router.patch("/usuarios/verificar/{residencia_id}/{usuario_id}")
 async def verificar_residencia_usuario_route(residencia_id: UUID, usuario_id: UUID, db=Depends(get_db)):
@@ -59,3 +74,4 @@ async def verificar_residencia_usuario_route(residencia_id: UUID, usuario_id: UU
     if not success:
         raise HTTPException(status_code=404, detail="Relación residencia-usuario no encontrada")
     return {"message": "Relación verificada correctamente"}
+

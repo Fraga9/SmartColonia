@@ -18,6 +18,7 @@ import SignUp from './screens/SignUp';
 import BuscarColoniaScreen from './screens/BuscarColoniaScreen';
 import CrearColoniaScreen from './screens/CrearColoniaScreen';
 import CrearResidenciasScreen from './screens/CrearResidenciasScreen';
+import ReclamarResidencia from './screens/ReclamarResidencia';
 // Import auth context
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -174,6 +175,7 @@ const Navigation = () => {
             <Stack.Screen name="BuscarColoniaScreen" component={BuscarColoniaScreen}/>
             <Stack.Screen name="CrearColoniaScreen" component={CrearColoniaScreen}/>
             <Stack.Screen name="CrearResidenciasScreen" component={CrearResidenciasScreen}/>
+            <Stack.Screen name="ReclamarResidencia" component={ReclamarResidencia}/>
           </>
         )}
       </Stack.Navigator>
