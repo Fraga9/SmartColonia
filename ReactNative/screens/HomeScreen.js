@@ -37,6 +37,12 @@ const HomeScreen = ({ navigation }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newNotifications, setNewNotifications] = useState(3);
+  const ROLE_NAMES = {
+    1: 'Administrador',
+    2: 'Vigilante',
+    3: 'Vecino'
+  };
+  
 
   // Fetch user profile information
   useEffect(() => {
@@ -50,10 +56,13 @@ const HomeScreen = ({ navigation }) => {
           .single();
         
         if (userError) throw userError;
-        
+        const getRoleName = (roleId) => {
+          return ROLE_NAMES[roleId] || 'Usuario';
+        };
+
         // Set user information
         setUserName(userData.nombre + " " + userData.apellido || 'Usuario');
-        setUserRole(userData.tipo_usuario_id === 3 ? 'Vecino' : 'Usuario');
+        setUserRole(getRoleName(userData.tipo_usuario_id));
         setTipoUsuarioId(userData.tipo_usuario_id);
         setColoniaId(userData.colonia_id);
         

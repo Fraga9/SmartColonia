@@ -3,16 +3,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import logging
 import uvicorn
-from models import User, Colonia, Residencia, Visita, UserCreate, ColoniaCreate, ResidenciaCreate, Residencia, ResidenciaUsuarioCreate, ResidenciaUsuario
-from crud import create_user_in_auth_and_db, get_users, create_colonia, get_colonias, create_residencia, get_residencias, create_visita, get_visitas, get_user_by_id
-from crud import (
-    create_residencia, get_residencias, get_residencia_by_id, 
-    get_residencias_by_colonia, create_residencia_usuario,
-    get_residencias_by_usuario, verificar_residencia_usuario, serialize_model
-)
 from database import get_db
 from uuid import UUID, uuid4
 from datetime import datetime
+
+from models.user import User, UserCreate
+from models.colonia import Colonia, ColoniaCreate
+from models.residencia import Residencia, ResidenciaCreate, ResidenciaUsuario, ResidenciaUsuarioCreate
+from models.visita import Visita
+
+from crud.colonias import create_colonia, get_colonias, get_colonia_by_id, update_colonia, delete_colonia
+from crud.base import serialize_model
+from crud.residencias import (
+    create_residencia, get_residencias, get_residencia_by_id, get_residencias_by_colonia,
+    create_residencia_usuario, get_residencias_by_usuario, verificar_residencia_usuario
+)
+from crud.usuarios import create_user_in_auth_and_db, get_user_by_id, get_users
+from crud.visitas import create_visita, get_visitas
+
+
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)

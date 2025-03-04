@@ -120,60 +120,61 @@ const CrearResidenciasScreen = ({ navigation, route }) => {
   };
 
   // Crear residencia individual
-  const crearResidenciaIndividual = async () => {
-    if (!isIndividualFormValid()) {
-      Alert.alert('Error', 'Por favor complete todos los campos obligatorios.');
-      return;
-    }
+const crearResidenciaIndividual = async () => {
+  if (!isIndividualFormValid()) {
+    Alert.alert('Error', 'Por favor complete todos los campos obligatorios.');
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      // Datos de residencia
-      const residenciaData = {
-        numero: numero.trim(),
-        calle: calle.trim(),
-        referencia: referencia.trim(),
-        colonia_id: coloniaId
-      };
+  try {
+    // Datos de residencia
+    const residenciaData = {
+      numero: numero.trim(),
+      calle: calle.trim(),
+      referencia: referencia.trim(),
+      colonia_id: coloniaId
+    };
 
-      // Crear residencia
-      const { data, error } = await supabase
-        .from('residencias')
-        .insert(residenciaData)
-        .select()
-        .single();
+    // Crear residencia
+    const { data, error } = await supabase
+      .from('residencias')
+      .insert(residenciaData)
+      .select()
+      .single();
 
-      if (error) throw error;
+    if (error) throw error;
 
-      // Asociar usuario a residencia (Admin)
-      const relacion = {
-        usuario_id: user.id,
-        residencia_id: data.id,
-        rol: 'administrador',
-        es_principal: true,
-        verificado: true
-      };
+    // Remove the code that associates user with residence
 
-      const { error: relacionError } = await supabase
-        .from('residencias_usuarios')
-        .insert(relacion);
-
-      if (relacionError) throw relacionError;
-
-      Alert.alert(
-        'Éxito', 
-        `Residencia creada correctamente.\n\nCódigo de la residencia:\n${data.id}`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
-      
-    } catch (error) {
-      console.error('Error al crear residencia:', error.message);
-      Alert.alert('Error', 'No se pudo crear la residencia. Intente nuevamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    Alert.alert(
+      'Éxito', 
+      `Residencia creada correctamente.\n\nCódigo de la residencia:\n${data.id}`,
+      [
+        { 
+          text: 'Crear más', 
+          onPress: () => {
+            setNumero('');
+            setCalle('');
+            setReferencia('');
+          } 
+        },
+        { 
+          text: 'Continuar', 
+          style: 'default',
+          onPress: () => navigation.navigate('Home')
+        }
+      ]
+    );
+    
+  } catch (error) {
+    console.error('Error al crear residencia:', error.message);
+    Alert.alert('Error', 'No se pudo crear la residencia. Intente nuevamente.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Crear residencias masivamente
   const crearResidenciasMasivas = async () => {
@@ -200,25 +201,30 @@ const CrearResidenciasScreen = ({ navigation, route }) => {
 
       if (error) throw error;
 
-      // Crear relaciones para el administrador
-      const relaciones = data.map(residencia => ({
-        usuario_id: user.id,
-        residencia_id: residencia.id,
-        rol: 'administrador',
-        es_principal: true,
-        verificado: true
-      }));
-
-      const { error: relacionesError } = await supabase
-        .from('residencias_usuarios')
-        .insert(relaciones);
-
-      if (relacionesError) throw relacionesError;
+      // Remove the code that creates user-residence relationships
+      // This is where we previously created the associations
 
       Alert.alert(
         'Éxito', 
         `${data.length} residencias creadas correctamente.`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [
+          { 
+            text: 'Crear más', 
+            onPress: () => {
+              // Reset the form fields to create more residences
+              setPrefijoCalle('');
+              setRangoInicio('');
+              setRangoFin('');
+              setResidenciasGeneradas([]);
+              setGenerarLista(false);
+            } 
+          },
+          { 
+            text: 'Continuar', 
+            style: 'default',
+            onPress: () => navigation.navigate('Home')  // Navigate to Home screen
+          }
+        ]
       );
       
     } catch (error) {
