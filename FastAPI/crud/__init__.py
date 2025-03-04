@@ -12,3 +12,6 @@ from crud.usuarios import create_user_in_auth_and_db, get_user_by_id, get_users
 
 # Importar desde visitas.py
 from crud.visitas import create_visita, get_visitas
+
+# Importar desde anuncios.py
+from crud.anuncios import create_anuncio, get_anuncios, get_anuncio_by_id, get_anuncios_by_colonia

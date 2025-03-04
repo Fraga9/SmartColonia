@@ -61,13 +61,11 @@ const HomeScreen = ({ navigation }) => {
         };
 
         // Set user information
-        setUserName(userData.nombre + " " + userData.apellido || 'Usuario');
+        setUserName(userData.nombre + "" + userData.apellido || 'Usuario');
         setUserRole(getRoleName(userData.tipo_usuario_id));
         setTipoUsuarioId(userData.tipo_usuario_id);
         setColoniaId(userData.colonia_id);
         
-        // Fetch announcements
-        fetchAnnouncements(userData.colonia_id);
         
         // Fetch payments
         fetchPayments(user.id);
@@ -85,36 +83,7 @@ const HomeScreen = ({ navigation }) => {
   }, [user]);
 
   // Fetch community announcements
-  const fetchAnnouncements = async (coloniaId) => {
-    try {
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('colonia_id', coloniaId)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      
-      if (error) throw error;
-      setAnnouncements(data || []);
-    } catch (error) {
-      console.error('Error fetching announcements:', error.message);
-      // Set mock data
-      setAnnouncements([
-        { 
-          id: 1, 
-          title: 'Mantenimiento programado', 
-          description: 'Corte de agua el día 25 de marzo de 9am a 12pm',
-          created_at: '2025-03-01T10:00:00Z'
-        },
-        {
-          id: 2,
-          title: 'Asamblea vecinal',
-          description: 'Se invita a todos los vecinos a la asamblea del 28 de marzo a las 7pm',
-          created_at: '2025-03-02T11:30:00Z'
-        }
-      ]);
-    }
-  };
+
 
   // Fetch payment information
   const fetchPayments = async (userId) => {
@@ -205,10 +174,7 @@ const HomeScreen = ({ navigation }) => {
         <Actions navigation={navigation} />
 
         {/* Announcements Section */}
-        <AnnouncementCard 
-          announcements={announcements} 
-          formatDate={formatDate} 
-        />
+        <AnnouncementCard coloniaId={coloniaId} />
 
         {/* Payment Reminders */}
         <PaymentCard 
