@@ -14,6 +14,7 @@ import ColoniasScreen from './screens/ColoniasScreen';
 import ResidenciasScreen from './screens/ResidenciasScreen';
 import VisitasScreen from './screens/VisitasScreen';
 import Login from './screens/Login';
+import LandingScreen from './screens/LandingPage';
 import SignUp from './screens/SignUp';
 import BuscarColoniaScreen from './screens/BuscarColoniaScreen';
 import CrearColoniaScreen from './screens/CrearColoniaScreen';
@@ -157,15 +158,43 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!user ? (
-          // Auth routes
+      <Stack.Navigator 
+        screenOptions={{ 
+          headerShown: false,
+          animation: 'slide_from_right' // Optional: adds a slide animation
+        }}
+      >
+        {/* Always show LandingScreen first if not authenticated */}
+        {!user && (
+          <Stack.Screen 
+            name="Landing" 
+            component={LandingScreen} 
+          />
+        )}
+
+        {/* Authentication Routes */}
+        {!user && (
           <>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen 
+              name="Login" 
+              component={Login} 
+              options={{ 
+                // Optional: customize transition if needed
+                animation: 'slide_from_right' 
+              }}
+            />
+            <Stack.Screen 
+              name="SignUp" 
+              component={SignUp} 
+              options={{ 
+                animation: 'slide_from_right' 
+              }}
+            />
           </>
-        ) : (
-          // App routes (protected)
+        )}
+
+        {/* Protected App Routes */}
+        {user && (
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="UsersScreen" component={UsersScreen} />
@@ -176,6 +205,8 @@ const Navigation = () => {
             <Stack.Screen name="CrearColoniaScreen" component={CrearColoniaScreen}/>
             <Stack.Screen name="CrearResidenciasScreen" component={CrearResidenciasScreen}/>
             <Stack.Screen name="ReclamarResidencia" component={ReclamarResidencia}/>
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="QRGeneratorScreen" component={QRGeneratorScreen} />
           </>
         )}
       </Stack.Navigator>
@@ -183,7 +214,7 @@ const Navigation = () => {
   );
 };
 
-// Main App component
+// (Keep the rest of the App component the same as in the previous file)
 export default function App() {
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
