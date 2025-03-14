@@ -22,8 +22,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'register-visit',
       icon: 'account-plus',
       text: 'Registrar visita',
-      color: '#4F46E5',
-      secondaryColor: '#818CF8',
+      color: '#2196F3',         // Azul primario del tema
+      secondaryColor: '#90CAF9', // Versión más clara
       screen: 'RegistrarVisitasScreen',
       badge: null,
       description: 'Registra una nueva visita'
@@ -32,8 +32,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'my-visits',
       icon: 'account-group',
       text: 'Mis visitas',
-      color: '#2563EB',
-      secondaryColor: '#60A5FA',
+      color: '#1976D2',         // Azul un poco más oscuro
+      secondaryColor: '#64B5F6', // Su versión más clara
       screen: 'MisVisitasScreen',
       badge: pendingVisits > 0 ? pendingVisits : null,
       description: 'Administra tus visitas activas'
@@ -42,8 +42,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'qr-code',
       icon: 'qrcode-scan',
       text: 'QR de acceso',
-      color: '#7C3AED',
-      secondaryColor: '#A78BFA',
+      color: '#0D47A1',         // Azul aún más oscuro
+      secondaryColor: '#42A5F5', // Su versión más clara
       screen: 'QRGeneratorScreen',
       badge: null,
       description: 'Genera códigos QR para invitados'
@@ -52,8 +52,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'services',
       icon: 'toolbox',
       text: 'Servicios',
-      color: '#10B981',
-      secondaryColor: '#6EE7B7',
+      color: '#03A9F4',         // Color de acento del tema
+      secondaryColor: '#81D4FA', // Su versión más clara
       screen: 'ServiciosScreen',
       badge: null,
       description: 'Solicita servicios para tu hogar'
@@ -65,8 +65,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'payments',
       icon: 'credit-card-outline',
       text: 'Pagos',
-      color: '#F59E0B',
-      secondaryColor: '#FCD34D',
+      color: '#00BCD4',         // Cian, complementario al azul
+      secondaryColor: '#80DEEA', // Su versión más clara
       screen: 'PagosScreen',
       description: 'Administra tus pagos'
     },
@@ -74,8 +74,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'reports',
       icon: 'alert-outline',
       text: 'Reportes',
-      color: '#EF4444',
-      secondaryColor: '#FCA5A5',
+      color: '#FF5722',         // Naranja rojizo para alertas
+      secondaryColor: '#FFAB91', // Su versión más clara
       screen: 'ReportesScreen',
       description: 'Reporta incidentes'
     },
@@ -83,8 +83,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'deliveries',
       icon: 'package-variant',
       text: 'Paquetería',
-      color: '#F97316',
-      secondaryColor: '#FDBA74',
+      color: '#009688',         // Verde azulado
+      secondaryColor: '#80CBC4', // Su versión más clara
       screen: 'PaqueteriaScreen',
       description: 'Rastrea tus paquetes'
     },
@@ -92,8 +92,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       id: 'directory',
       icon: 'book-outline',
       text: 'Directorio',
-      color: '#8B5CF6',
-      secondaryColor: '#C4B5FD',
+      color: '#673AB7',         // Púrpura, complementario
+      secondaryColor: '#B39DDB', // Su versión más clara
       screen: 'DirectorioScreen',
       description: 'Contactos importantes'
     }
@@ -139,8 +139,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
                 )}
               </View>
               <View style={styles.textContainer}>
-                <Text style={styles.cardTitle}>{item.text}</Text>
-                <Text style={styles.cardDescription} numberOfLines={2}>
+                  <Text style={[styles.cardTitle, { fontFamily: theme.fonts.bold.fontFamily }]}>{item.text}</Text>
+                  <Text style={[styles.cardDescription, { fontFamily: theme.fonts.regular.fontFamily }]} numberOfLines={2}>
                   {item.description}
                 </Text>
               </View>
@@ -178,8 +178,12 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
                   <MaterialCommunityIcons name={item.icon} size={24} color="#FFF" />
                 </View>
                 <View style={styles.secondaryTextContainer}>
-                  <Text style={styles.secondaryCardTitle}>{item.text}</Text>
-                  <Text style={styles.secondaryCardDescription} numberOfLines={1}>{item.description}</Text>
+                  <Text style={[styles.secondaryCardTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>
+                    {item.text}
+                  </Text>
+                  <Text style={[styles.secondaryCardDescription, { fontFamily: theme.fonts.regular.fontFamily }]} numberOfLines={1}>
+                    {item.description}
+                  </Text>
                 </View>
                 <MaterialCommunityIcons name="chevron-right" size={20} color={item.color} style={styles.arrowIcon} />
               </View>
@@ -204,7 +208,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
           <Text
             style={[
               styles.tabText,
-              activeSection === 'frequent' && { color: theme.colors.primary, fontWeight: 'bold' }
+              { fontFamily: theme.fonts.medium.fontFamily },
+              activeSection === 'frequent' && { color: theme.colors.primary, fontFamily: theme.fonts.bold.fontFamily }
             ]}
           >
             Acciones frecuentes
@@ -220,7 +225,8 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
           <Text
             style={[
               styles.tabText,
-              activeSection === 'all' && { color: theme.colors.primary, fontWeight: 'bold' }
+              { fontFamily: theme.fonts.medium.fontFamily },
+              activeSection === 'all' && { color: theme.colors.primary, fontFamily: theme.fonts.bold.fontFamily }
             ]}
           >
             Todas
@@ -238,9 +244,9 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
           animate={{ opacity: 1, translateX: 0 }}
           transition={{ type: 'timing', duration: 500 }}
         >
-          <Text style={[styles.title, { color: theme.colors.primary }]}>
-            Acciones rápidas
-          </Text>
+        <Text style={[styles.title, { color: theme.colors.primary, fontFamily: theme.fonts.bold.fontFamily }]}>
+          Acciones rápidas
+        </Text>
         </MotiView>
         {renderTabSelector()}
       </View>
@@ -257,9 +263,9 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
         transition={{ delay: 400, type: 'timing', duration: 500 }}
         style={styles.sectionTitleContainer}
       >
-        <Text style={styles.sectionTitle}>Acciones adicionales</Text>
+        <Text style={[styles.sectionTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>Acciones adicionales</Text>
         <TouchableOpacity>
-          <Text style={styles.viewAllText}>Ver todas</Text>
+          <Text style={[styles.viewAllText, { fontFamily: theme.fonts.medium.fontFamily }]}>Ver todas</Text>
         </TouchableOpacity>
       </MotiView>
       
@@ -286,7 +292,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
   },
   primaryActionsContainer: {
     flexDirection: 'row',
@@ -350,7 +355,6 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   cardTitle: {
-    fontWeight: 'bold',
     fontSize: 16,
     color: 'white',
     marginBottom: 4,
@@ -374,7 +378,6 @@ const styles = StyleSheet.create({
   viewAllText: {
     fontSize: 12,
     color: theme => theme.colors.primary,
-    fontWeight: '500',
   },
   // New styles for horizontal scrollable secondary actions
   secondaryActionsScrollContainer: {
@@ -419,7 +422,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   secondaryCardTitle: {
-    fontWeight: '600',
     fontSize: 14,
     color: '#333',
     marginBottom: 2,

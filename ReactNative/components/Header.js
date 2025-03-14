@@ -11,9 +11,9 @@ const Header = ({ userName, userRole, newNotifications, navigation }) => {
 
   return (
     <View style={styles.headerContainer}>
-      {/* Gradient background with modern colors */}
+      {/* Gradient background with theme-aligned colors */}
       <LinearGradient
-        colors={['#4F46E5', '#7C3AED']}
+        colors={['#2196F3', '#1976D2']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}

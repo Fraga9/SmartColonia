@@ -92,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
   const themeStyles = {
     statValue: {
       fontSize: 20,
-      fontWeight: 'bold',
+      fontFamily: theme.fonts.bold.fontFamily, // Usar fontFamily en lugar de fontWeight
       color: theme.colors.primary,
     },
     primaryColorText: {
@@ -100,9 +100,11 @@ const HomeScreen = ({ navigation }) => {
     },
     navActiveItem: {
       color: theme.colors.primary,
+      fontFamily: theme.fonts.medium.fontFamily, // Añadir fontFamily
     },
     navInactiveItem: {
       color: theme.colors.backdrop,
+      fontFamily: theme.fonts.regular.fontFamily, // Añadir fontFamily
     }
   };
 
@@ -325,6 +327,7 @@ const HomeScreen = ({ navigation }) => {
       ]}>
         <FAB
           icon="plus"
+          theme={{ colors: { surfaceVariant: '#2196F3', onSurfaceVariant: 'white' } }}
           style={styles.fab}
           onPress={() => {
             // Show action sheet or navigate to a "create new" screen
@@ -370,7 +373,7 @@ const HomeScreen = ({ navigation }) => {
               size={24} 
               color={theme.colors.primary} 
             />
-            <PaperText style={[styles.navText, themeStyles.primaryColorText]}>
+            <PaperText style={[styles.navText, themeStyles.primaryColorText, { fontFamily: theme.fonts.medium.fontFamily }]}>
               Inicio
             </PaperText>
           </View>
@@ -387,7 +390,7 @@ const HomeScreen = ({ navigation }) => {
               size={24} 
               color={theme.colors.backdrop} 
             />
-            <PaperText style={styles.navText}>
+            <PaperText style={[styles.navText, { fontFamily: theme.fonts.regular.fontFamily }]}>
               Visitas
             </PaperText>
           </View>
@@ -403,7 +406,7 @@ const HomeScreen = ({ navigation }) => {
               size={24} 
               color={theme.colors.backdrop} 
             />
-            <PaperText style={styles.navText}>
+            <PaperText style={[styles.navText, { fontFamily: theme.fonts.regular.fontFamily }]}>
               QR
             </PaperText>
           </View>
@@ -419,7 +422,7 @@ const HomeScreen = ({ navigation }) => {
               size={24} 
               color={theme.colors.backdrop} 
             />
-            <PaperText style={styles.navText}>
+            <PaperText style={[styles.navText, { fontFamily: theme.fonts.regular.fontFamily }]}>
               Perfil
             </PaperText>
           </View>
@@ -432,7 +435,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4ff',
+    backgroundColor: '#f6f6f6',
   },
   scrollView: {
     flex: 1,
@@ -497,7 +500,6 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 12,
     marginTop: 4,
-    fontWeight: '500',
     color: '#999',
   },
   navItemIndicator: {
@@ -505,7 +507,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 30,
     height: 3,
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#2196F3', // Cambiado de '#4F46E5' al color primario del tema
     borderRadius: 3,
   },
   // FAB styles
@@ -515,7 +517,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   fab: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#2196F3', 
   },
   // Scroll to top button
   scrollTopButton: {
