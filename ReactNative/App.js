@@ -205,8 +205,7 @@ const Navigation = () => {
             <Stack.Screen name="CrearColoniaScreen" component={CrearColoniaScreen}/>
             <Stack.Screen name="CrearResidenciasScreen" component={CrearResidenciasScreen}/>
             <Stack.Screen name="ReclamarResidencia" component={ReclamarResidencia}/>
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-            <Stack.Screen name="QRGeneratorScreen" component={QRGeneratorScreen} />
+            
           </>
         )}
       </Stack.Navigator>

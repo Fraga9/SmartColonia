@@ -1,21 +1,43 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, StatusBar, Dimensions, Animated } from 'react-native';
 import { Surface, Avatar, IconButton, Badge, useTheme, Text as PaperText } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import { MotiView } from 'moti';
 
 const Header = ({ userName, userRole, newNotifications, navigation }) => {
   const theme = useTheme();
+  const { width } = Dimensions.get('window');
 
   return (
-    <Surface style={styles.headerContainer} elevation={0}>
+    <View style={styles.headerContainer}>
+      {/* Gradient background with modern colors */}
       <LinearGradient
-        colors={['#2196F3', '#03A9F4']}
+        colors={['#4F46E5', '#7C3AED']}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={styles.gradient}
       >
+        {/* Animated decorative elements */}
+        <MotiView 
+          from={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.3, scale: 1 }}
+          transition={{ type: 'timing', duration: 1000 }}
+          style={[styles.circleDecoration, { left: width * 0.1 }]} 
+        />
+        <MotiView 
+          from={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.15, scale: 1 }}
+          transition={{ type: 'timing', duration: 1000, delay: 200 }}
+          style={[styles.circleDecoration, { right: width * 0.15, top: 30 }]} 
+        />
+        
         <View style={styles.welcomeSection}>
-          <View>
+          <MotiView
+            from={{ opacity: 0, translateY: 10 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: 'timing', duration: 700 }}
+          >
             <PaperText style={[styles.welcomeText, { fontFamily: theme.fonts.medium.fontFamily, color: '#fff' }]}>
               Bienvenido,
             </PaperText>
@@ -29,61 +51,91 @@ const Header = ({ userName, userRole, newNotifications, navigation }) => {
                 </PaperText>
               </View>
             )}
-          </View>
+          </MotiView>
           <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.notificationContainer}
-              onPress={() => navigation.navigate('NotificationsScreen')}
+            <MotiView
+              from={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', delay: 300 }}
             >
-              <View style={styles.iconBackground}>
-                <IconButton 
-                  icon="bell-outline" 
-                  size={22} 
-                  color="#fff"
-                  style={styles.notificationIcon}
-                />
-                {newNotifications > 0 && (
-                  <Badge 
-                    style={styles.notificationBadge}
-                    size={18}
-                  >
-                    {newNotifications}
-                  </Badge>
-                )}
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => navigation.navigate('ProfileScreen')}
-              style={styles.avatarContainer}
+              <TouchableOpacity 
+                style={styles.notificationContainer}
+                onPress={() => navigation.navigate('NotificationsScreen')}
+                accessibilityLabel="Notificaciones"
+                accessibilityHint="Pulsa para ver tus notificaciones"
+              >
+                <BlurView intensity={30} tint="light" style={styles.iconBackground}>
+                  <IconButton 
+                    icon="bell-outline" 
+                    size={22} 
+                    color="#fff"
+                    style={styles.notificationIcon}
+                  />
+                  {newNotifications > 0 && (
+                    <Badge 
+                      style={styles.notificationBadge}
+                      size={18}
+                    >
+                      {newNotifications}
+                    </Badge>
+                  )}
+                </BlurView>
+              </TouchableOpacity>
+            </MotiView>
+            <MotiView
+              from={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', delay: 400 }}
             >
-              <Avatar.Image 
-                size={40} 
-                source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
-                style={styles.userAvatar}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('ProfileScreen')}
+                style={styles.avatarContainer}
+                accessibilityLabel="Perfil de usuario"
+                accessibilityHint="Pulsa para ver tu perfil"
+              >
+                <BlurView intensity={20} tint="light" style={styles.avatarBlur}>
+                  <Avatar.Image 
+                    size={42} 
+                    source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
+                    style={styles.userAvatar}
+                  />
+                </BlurView>
+              </TouchableOpacity>
+            </MotiView>
           </View>
         </View>
       </LinearGradient>
-    </Surface>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    marginBottom: 5,
-    borderRadius: 0,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
     overflow: 'hidden',
   },
   gradient: {
     paddingTop: StatusBar.currentHeight + 15,
-    paddingBottom: 30,
     paddingHorizontal: 20,
+    paddingBottom: 60, // Extended to allow content card to overlap
+  },
+  circleDecoration: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    top: 10,
   },
   welcomeSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
   welcomeText: {
     fontSize: 14,
@@ -91,15 +143,18 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   userName: {
-    fontSize: 22,
+    fontSize: 24,
     letterSpacing: 0.3,
+    marginTop: 4,
   },
   roleContainer: {
     backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
     alignSelf: 'flex-start',
+    marginTop: 8,
+    backdropFilter: 'blur(8px)',
   },
   userRole: {
     fontSize: 12,
@@ -110,13 +165,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconBackground: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 50,
     padding: 5,
+    overflow: 'hidden',
   },
   notificationContainer: {
     position: 'relative',
-    marginRight: 10,
+    marginRight: 12,
+    // Make tap target larger for better accessibility (Fitts's Law)
+    padding: 4, 
   },
   notificationIcon: {
     margin: 0,
@@ -130,9 +187,15 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
   },
   avatarContainer: {
-    padding: 2,
     borderRadius: 50,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    overflow: 'hidden',
+    // Make tap target larger for better accessibility (Fitts's Law)
+    padding: 4,
+  },
+  avatarBlur: {
+    padding: 3,
+    borderRadius: 50,
+    overflow: 'hidden',
   },
   userAvatar: {
     borderWidth: 2,
