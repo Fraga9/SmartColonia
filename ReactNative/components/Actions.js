@@ -11,7 +11,7 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.45;
 const SPACING = 12;
 
-const Actions = ({ navigation, pendingVisits = 2 }) => {
+const Actions = ({ navigation, pendingVisits = 2, user, residencias = [] }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [activeSection, setActiveSection] = useState('frequent');
@@ -24,7 +24,7 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       text: 'Registrar visita',
       color: '#2196F3',         // Azul primario del tema
       secondaryColor: '#90CAF9', // Versión más clara
-      screen: 'RegistrarVisitasScreen',
+      screen: 'RegisterVisitScreen',
       badge: null,
       description: 'Registra una nueva visita'
     },
@@ -80,13 +80,13 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       description: 'Reporta incidentes'
     },
     {
-      id: 'deliveries',
-      icon: 'package-variant',
-      text: 'Paquetería',
+      id: 'announcement',
+      icon: 'bullhorn-outline',
+      text: 'Anuncios',
       color: '#009688',         // Verde azulado
       secondaryColor: '#80CBC4', // Su versión más clara
-      screen: 'PaqueteriaScreen',
-      description: 'Rastrea tus paquetes'
+      screen: 'AnunciosScreen',
+      description: 'Mira los anuncio de tu colonia'
     },
     {
       id: 'directory',
@@ -111,7 +111,17 @@ const Actions = ({ navigation, pendingVisits = 2 }) => {
       >
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => navigation.navigate(item.screen)}
+          onPress={() => {
+            // Para RegisterVisitScreen, pasamos los datos necesarios
+            if (item.screen === 'RegisterVisitScreen') {
+              navigation.navigate(item.screen, {
+                userId: user.id,           // Agrega user como prop al componente Actions
+                residencias: residencias   // Agrega residencias como prop al componente Actions
+              });
+            } else {
+              navigation.navigate(item.screen);
+            }
+          }}
           style={[styles.touchable, { width: CARD_WIDTH }]}
           accessibilityLabel={item.text}
           accessibilityHint={item.description}

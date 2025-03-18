@@ -196,6 +196,7 @@ const HomeScreen = ({ navigation }) => {
 
       const allResidencias = await Promise.all(residenciasPromises);
       setResidencias(allResidencias);
+      console.log('User residencias:', allResidencias);
 
     } catch (error) {
       console.error('Error fetching user residencias:', error.message);
@@ -302,7 +303,11 @@ const HomeScreen = ({ navigation }) => {
             entering={FadeInDown.delay(300).duration(600)}
             style={styles.actionsContainer}
           >
-            <Actions navigation={navigation} />
+            <Actions 
+              navigation={navigation} 
+              user={user}
+              residencias={residencias} 
+            />
           </Animated.View>
 
           {/* Announcements Section with animation */}

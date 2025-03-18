@@ -20,6 +20,8 @@ import BuscarColoniaScreen from './screens/BuscarColoniaScreen';
 import CrearColoniaScreen from './screens/CrearColoniaScreen';
 import CrearResidenciasScreen from './screens/CrearResidenciasScreen';
 import ReclamarResidencia from './screens/ReclamarResidencia';
+import RegisterVisitScreen from './screens/RegisterVisitScreen';
+
 // Import auth context
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -161,7 +163,10 @@ const Navigation = () => {
       <Stack.Navigator 
         screenOptions={{ 
           headerShown: false,
-          animation: 'slide_from_right' // Optional: adds a slide animation
+          animation: 'slide_from_right',
+          contentStyle: { backgroundColor: 'transparent' },
+          headerTransparent: true,
+          safeAreaInsets: { top: 0, bottom: 0, left: 0, right: 0 } 
         }}
       >
         {/* Always show LandingScreen first if not authenticated */}
@@ -205,6 +210,7 @@ const Navigation = () => {
             <Stack.Screen name="CrearColoniaScreen" component={CrearColoniaScreen}/>
             <Stack.Screen name="CrearResidenciasScreen" component={CrearResidenciasScreen}/>
             <Stack.Screen name="ReclamarResidencia" component={ReclamarResidencia}/>
+            <Stack.Screen name="RegisterVisitScreen" component={RegisterVisitScreen}/>
             
           </>
         )}

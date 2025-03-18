@@ -96,7 +96,7 @@ const Header = ({ userName, userRole, newNotifications, navigation }) => {
                 <BlurView intensity={20} tint="light" style={styles.avatarBlur}>
                   <Avatar.Image 
                     size={42} 
-                    source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }} 
+                    source={{ uri: 'https://randomuser.me/api/portraits/men/31.jpg' }} 
                     style={styles.userAvatar}
                   />
                 </BlurView>

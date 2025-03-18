@@ -15,7 +15,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": true,
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para escanear códigos QR",
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
+      }
     },
     "android": {
       "jsEngine": "hermes",
@@ -23,18 +28,19 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "androidStatusBar": {
+        "translucent": true,
+        "backgroundColor": "#00000000",
+        "barStyle": "light-content"
+      },
       "permissions": [
-        "android.permission.CAMERA",
         "android.permission.CAMERA"
       ],
-      "package": "com.anonymous.ReactNative"
+      "package": "com.anonymous.ReactNative",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "SUPABASE_URL": "https://uammxewwluoirsfdvfmu.supabase.co",
-      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI"
     },
     "plugins": [
       [
@@ -42,7 +48,23 @@
         {
           "cameraPermission": "Permitir a $(PRODUCT_NAME) acceder a la cámara para escanear códigos QR."
         }
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "PORTRAIT"
+        }
+      ],
+      [
+        "expo-status-bar",
+        {
+          "style": "light"
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "SUPABASE_URL": "https://uammxewwluoirsfdvfmu.supabase.co",
+      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI"
+    }
   }
 }
