@@ -14,32 +14,34 @@ import {
   useTheme,
   Text,
   TextInput,
-  Button,
-  IconButton,
   Divider,
-  Checkbox,
   Switch,
-  RadioButton,
   Appbar
 } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MotiView } from 'moti';
+import { MotiView, MotiPressable } from 'moti';
 import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { createClient } from '@supabase/supabase-js';
 
+// Importing the components you want to keep
 import ResidenciaSelector from '../components/visita/ResidenciaSelector';
 import TipoVisitaSelector from '../components/visita/TipoVisitaSelector';
 import DateTimeSelector from '../components/visita/DateTimeSelector';
 import SubmitButton from '../components/visita/SubmitButton';
+
+// Animated components
 import Animated, { 
   useAnimatedScrollHandler, 
   useAnimatedStyle, 
   useSharedValue, 
   interpolate,
-  Extrapolation
+  Extrapolation,
+  withTiming,
+  withSequence,
+  withDelay
 } from 'react-native-reanimated';
 
 // Supabase Client
@@ -59,6 +61,8 @@ const RegisterVisitScreen = ({ navigation, route }) => {
 
   // Animation values
   const scrollY = useSharedValue(0);
+  const headerOpacity = useSharedValue(1);
+  const formScale = useSharedValue(0.97);
 
   // Form state
   const [nombreVisitante, setNombreVisitante] = useState('');
@@ -70,44 +74,62 @@ const RegisterVisitScreen = ({ navigation, route }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [residenciaId, setResidenciaId] = useState(null);
-  const [residencias, setResidencias] = useState(residenciasParam); // Initialize with passed data
+  const [residencias, setResidencias] = useState(residenciasParam);
   const [selectedResidencia, setSelectedResidencia] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showResidenciaOptions, setShowResidenciaOptions] = useState(false);
+  
+  // Initialize animation values
+  useEffect(() => {
+    formScale.value = withTiming(1, { duration: 300 });
+    
+    StatusBar.setBarStyle('dark-content');
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor('transparent');
+      StatusBar.setTranslucent(true);
+    }
+    
+    return () => {
+      StatusBar.setBarStyle('default');
+    };
+  }, []);
 
-  // Scroll event handler
+  // Scroll event handler with improved physics
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
+      // Smooth damping effect for scroll
       scrollY.value = event.contentOffset.y;
+      
+      // Adjust header opacity with a smoother transition
+      headerOpacity.value = interpolate(
+        scrollY.value,
+        [0, 60],
+        [1, 0],
+        Extrapolation.CLAMP
+      );
     },
   });
 
   // Animated styles for the header
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const headerHeight = interpolate(
-      scrollY.value,
-      [0, 100],
-      [0, -100],
-      Extrapolation.CLAMP
-    );
-
     return {
-      transform: [{ translateY: headerHeight }],
-      opacity: interpolate(
-        scrollY.value,
-        [0, 100],
-        [1, 0],
-        Extrapolation.CLAMP
-      ),
+      opacity: headerOpacity.value,
     };
   });
 
-  // Animated styles for the appbar (persistent header)
+  // Animated styles for the appbar
   const appbarAnimatedStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       scrollY.value,
-      [50, 100],
+      [40, 80],
       [0, 1],
+      Extrapolation.CLAMP
+    );
+
+    const elevation = interpolate(
+      scrollY.value,
+      [40, 80],
+      [0, 8],
       Extrapolation.CLAMP
     );
 
@@ -118,46 +140,48 @@ const RegisterVisitScreen = ({ navigation, route }) => {
       left: 0,
       right: 0,
       zIndex: 1000,
-      elevation: opacity > 0 ? 4 : 0,
+      elevation,
+      style: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: elevation/2 },
+        shadowOpacity: opacity * 0.2,
+        shadowRadius: elevation/2,
+      }
+    };
+  });
+  
+  // Animated style for the form
+  const formAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: formScale.value },
+      ],
+      opacity: interpolate(
+        formScale.value,
+        [0.97, 1],
+        [0, 1],
+        Extrapolation.CLAMP
+      ),
     };
   });
 
-  useEffect(() => {
-    StatusBar.setBarStyle('light-content');
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent');
-      StatusBar.setTranslucent(true);
-    }
-    return () => {
-      // Reset when unmounting
-      StatusBar.setBarStyle('default');
-    };
-  }, []);
-
   // Use the passed residencias data
   useEffect(() => {
-    console.log('[Register Visit Screen] Received residencias:', residenciasParam);
-    
     if (residenciasParam && residenciasParam.length > 0) {
       setResidencias(residenciasParam);
 
-      // If there's only one residence, select it automatically
       if (residenciasParam.length === 1) {
         setSelectedResidencia(residenciasParam[0]);
         setResidenciaId(residenciasParam[0].id);
-        console.log('[Register Visit Screen] Residencia seleccionada automáticamente:', residenciasParam[0]);
       }
     } else {
-      // As fallback, keep the fetchUserResidencias function
-      console.log('[Register Visit Screen] No se recibieron residencias, ejecutando fetchUserResidencias');
       fetchUserResidencias();
     }
-  }, [residenciasParam]); // Add dependency to re-run if residenciasParam changes}
+  }, [residenciasParam]);
 
   // Fetch user's residencias
   const fetchUserResidencias = async () => {
     try {
-      // Si quieres mantener la lógica de redirección:
       Alert.alert("No tienes residencias registradas", "Debes reclamar una residencia primero.");
       navigation.navigate('ReclamarResidencia');
     } catch (error) {
@@ -166,29 +190,7 @@ const RegisterVisitScreen = ({ navigation, route }) => {
     }
   };
 
-  // Manejadores de eventos
-  const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || fechaProgramada;
-    setShowDatePicker(false);
-    
-    // Preservar la hora actual
-    const newDate = new Date(currentDate);
-    newDate.setHours(fechaProgramada.getHours(), fechaProgramada.getMinutes());
-    
-    setFechaProgramada(newDate);
-  };
-
-  const handleTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || fechaProgramada;
-    setShowTimePicker(false);
-    
-    // Preservar la fecha actual
-    const newDate = new Date(fechaProgramada);
-    newDate.setHours(currentTime.getHours(), currentTime.getMinutes());
-    
-    setFechaProgramada(newDate);
-  };
-
+  // Formatters
   const formatDate = (date) => {
     return date.toLocaleDateString('es-ES', {
       weekday: 'long',
@@ -205,16 +207,36 @@ const RegisterVisitScreen = ({ navigation, route }) => {
     });
   };
 
+  // Event handlers
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaProgramada;
+    setShowDatePicker(false);
+    
+    const newDate = new Date(currentDate);
+    newDate.setHours(fechaProgramada.getHours(), fechaProgramada.getMinutes());
+    
+    setFechaProgramada(newDate);
+  };
+
+  const handleTimeChange = (event, selectedTime) => {
+    const currentTime = selectedTime || fechaProgramada;
+    setShowTimePicker(false);
+    
+    const newDate = new Date(fechaProgramada);
+    newDate.setHours(currentTime.getHours(), currentTime.getMinutes());
+    
+    setFechaProgramada(newDate);
+  };
+
   const handleSubmit = async () => {
     if (!nombreVisitante || !apellidoVisitante || !identificacion || !residenciaId) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
+      Alert.alert('Campo requerido', 'Por favor completa todos los campos.');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Crear objeto de visita
       const visitaData = {
         nombre_visitante: nombreVisitante,
         apellido_visitante: apellidoVisitante,
@@ -226,7 +248,6 @@ const RegisterVisitScreen = ({ navigation, route }) => {
         activa: activa
       };
 
-      // Usar la API de Supabase para crear la visita
       const { data: createdVisita, error } = await supabase
         .from('visitas')
         .insert(visitaData)
@@ -257,62 +278,79 @@ const RegisterVisitScreen = ({ navigation, route }) => {
     }
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
+  // Render section titles with consistent styling
+  const renderSectionTitle = (title) => (
+    <MotiView
+      from={{ opacity: 0, translateY: 5 }}
+      animate={{ opacity: 1, translateY: 0 }}
+      transition={{ type: 'timing', duration: 300 }}
     >
-      {/* Persistent AppBar - aparece cuando se hace scroll */}
+      <View style={styles.sectionTitleContainer}>
+        <Text style={[
+          styles.sectionTitle, 
+          { fontFamily: theme.fonts.medium.fontFamily }
+        ]}>
+          {title}
+        </Text>
+      </View>
+    </MotiView>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Adaptative StatusBar */}
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      
+      {/* Persistent AppBar - appears when scrolling */}
       <Animated.View style={appbarAnimatedStyle}>
         <Appbar.Header style={styles.persistentAppbar}>
-          <Appbar.BackAction onPress={() => navigation.goBack()} color="#FFF" />
-          <Appbar.Content title="Registrar Visita" color="#FFF" />
-          <Appbar.Action icon="account-plus" color="#FFF" />
+          <Appbar.BackAction onPress={() => navigation.goBack()} color="#2196F3" />
+          <Appbar.Content 
+            title="Registrar Visita" 
+            color="#333"
+            titleStyle={styles.appbarTitle} 
+          />
         </Appbar.Header>
       </Animated.View>
 
-      {/* Contenido scrollable */}
+      {/* Main content */}
       <AnimatedScrollView
         contentContainerStyle={[
           styles.scrollContainer,
-          { paddingTop: insets.top, paddingBottom: insets.bottom + 20 }
+          { 
+            paddingTop: insets.top, 
+            paddingBottom: insets.bottom + 20 
+          }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
       >
-        {/* Encabezado animado que desaparece */}
+        {/* Animated header that disappears */}
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
-          <LinearGradient
-            colors={['#2196F3', '#1976D2', '#0D47A1']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.headerGradient, { borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }]}
-          >
-            <View style={styles.headerContent}>
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                style={styles.backButton}
-              >
-                <MaterialCommunityIcons name="arrow-left" size={24} color="#FFF" />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Registrar Visita</Text>
-              <View style={styles.headerIconContainer}>
-                <MaterialCommunityIcons name="account-plus" size={32} color="#FFF" />
-              </View>
+          <View style={styles.headerContent}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <MaterialCommunityIcons name="arrow-left" size={24} color="#2196F3" />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { fontFamily: theme.fonts.titleLarge.fontFamily }]}>Registrar Visita</Text>
+            <View style={styles.headerIconContainer}>
+              <MaterialCommunityIcons name="account-plus" size={26} color="#2196F3" />
             </View>
-          </LinearGradient>
+          </View>
         </Animated.View>
 
-        {/* Tarjeta de formulario */}
-        <MotiView
-          from={{ opacity: 0, translateY: 50 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          transition={{ type: 'timing', duration: 500, delay: 200 }}
-          style={styles.formCard}
-        >
-          <Surface style={styles.formContainer}>
-            {/* Selector de residencia */}
-            <Text style={[styles.sectionTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>Residencia</Text>
+        {/* Form card with pleasant animations */}
+        <Animated.View style={[formAnimatedStyle]}>
+          <View style={styles.formContainer}>
+            {/* Residencia Section */}
+            {renderSectionTitle("Residencia")}
             <ResidenciaSelector 
               residencias={residencias}
               selectedResidencia={selectedResidencia}
@@ -322,53 +360,66 @@ const RegisterVisitScreen = ({ navigation, route }) => {
               setShowResidenciaOptions={setShowResidenciaOptions}
               theme={theme}
             />
+            
             <Divider style={styles.divider} />
             
             {/* Datos del visitante */}
-            <Text style={[styles.sectionTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>Datos del visitante</Text>
+            {renderSectionTitle("Datos del visitante")}
             
-            <TextInput
-              label="Nombre"
-              value={nombreVisitante}
-              onChangeText={setNombreVisitante}
-              style={styles.input}
-              mode="outlined"
-              left={<TextInput.Icon icon="account" />}
-            />
-            
-            <TextInput
-              label="Apellido"
-              value={apellidoVisitante}
-              onChangeText={setApellidoVisitante}
-              style={styles.input}
-              mode="outlined"
-              left={<TextInput.Icon icon="account" />}
-            />
-            
-            <TextInput
-              label="Identificación"
-              value={identificacion}
-              onChangeText={setIdentificacion}
-              style={styles.input}
-              mode="outlined"
-              left={<TextInput.Icon icon="card-account-details" />}
-              placeholder="Número de identificación, licencia, etc."
-            />
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: 'timing', duration: 400, delay: 100 }}
+            >
+              <View style={styles.inputGroup}>
+                <TextInput
+                  label="Nombre"
+                  value={nombreVisitante}
+                  onChangeText={setNombreVisitante}
+                  style={styles.input}
+                  mode="outlined"
+                  outlineColor={theme.colors.surfaceVariant}
+                  left={<TextInput.Icon icon="account" color={theme.colors.primary} />}
+                />
+                
+                <TextInput
+                  label="Apellido"
+                  value={apellidoVisitante}
+                  onChangeText={setApellidoVisitante}
+                  style={styles.input}
+                  mode="outlined"
+                  outlineColor={theme.colors.surfaceVariant}
+                  left={<TextInput.Icon icon="account" color={theme.colors.primary} />}
+                />
+                
+                <TextInput
+                  label="Identificación"
+                  value={identificacion}
+                  onChangeText={setIdentificacion}
+                  style={styles.input}
+                  mode="outlined"
+                  outlineColor={theme.colors.surfaceVariant}
+                  left={<TextInput.Icon icon="card-account-details" color={theme.colors.primary} />}
+                  placeholder="Número de identificación, licencia, etc."
+                />
+              </View>
+            </MotiView>
             
             <Divider style={styles.divider} />
             
             {/* Tipo de visita */}
-            <Text style={[styles.sectionTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>Tipo de visita</Text>
+            {renderSectionTitle("Tipo de visita")}
             
             <TipoVisitaSelector 
               tipoVisita={tipoVisita}
               setTipoVisita={setTipoVisita}
+              theme={theme}
             />
             
             <Divider style={styles.divider} />
             
             {/* Fecha y hora */}
-            <Text style={[styles.sectionTitle, { fontFamily: theme.fonts.medium.fontFamily }]}>Fecha y hora programada</Text>
+            {renderSectionTitle("Fecha y hora programada")}
             
             <DateTimeSelector 
               fechaProgramada={fechaProgramada}
@@ -376,6 +427,7 @@ const RegisterVisitScreen = ({ navigation, route }) => {
               setShowTimePicker={setShowTimePicker}
               formatDate={formatDate}
               formatTime={formatTime}
+              theme={theme}
             />
             
             {showDatePicker && (
@@ -400,132 +452,144 @@ const RegisterVisitScreen = ({ navigation, route }) => {
             <Divider style={styles.divider} />
             
             {/* Estado de la visita */}
-            <View style={styles.switchContainer}>
-              <Text style={[styles.switchLabel, { fontFamily: theme.fonts.regular.fontFamily }]}>Activar QR inmediatamente</Text>
-              <Switch 
-                value={activa} 
-                onValueChange={setActiva} 
-                color={theme.colors.primary}
-              />
-            </View>
-            <Text style={[styles.switchDescription, { fontFamily: theme.fonts.regular.fontFamily }]}>
-              {activa 
-                ? 'El QR estará activo inmediatamente tras crear la visita' 
-                : 'El QR permanecerá inactivo hasta que lo actives manualmente'
-              }
-            </Text>
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: 'timing', duration: 400, delay: 150 }}
+              style={styles.switchSection}
+            >
+              <Surface style={styles.switchCard}>
+                <View style={styles.switchContainer}>
+                  <View style={styles.switchTextContainer}>
+                    <Text style={[styles.switchLabel, { fontFamily: theme.fonts.medium.fontFamily }]}>
+                      Activar QR inmediatamente
+                    </Text>
+                    <Text style={styles.switchDescription}>
+                      {activa 
+                        ? 'El QR estará activo tras crear la visita' 
+                        : 'El QR permanecerá inactivo hasta activación manual'
+                      }
+                    </Text>
+                  </View>
+                  <Switch 
+                    value={activa} 
+                    onValueChange={setActiva} 
+                    color={theme.colors.primary}
+                  />
+                </View>
+              </Surface>
+            </MotiView>
             
             {/* Botón de registro */}
             <SubmitButton 
               onPress={handleSubmit}
               isLoading={isLoading}
+              theme={theme}
             />
-          </Surface>
-        </MotiView>
+          </View>
+        </Animated.View>
       </AnimatedScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
+// Updated styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f6f6f6',
+    backgroundColor: '#FFFFFF',
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   header: {
     width: '100%',
-    overflow: 'hidden',
+    paddingBottom: 12,
+    marginBottom: 4,
   },
-headerGradient: {
-  paddingTop: Platform.OS === 'ios' ? insets.top : StatusBar.currentHeight,
-  paddingBottom: 20,
-  borderBottomLeftRadius: 24,
-  borderBottomRightRadius: 24,
-},
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
+    paddingTop: 12,
   },
   backButton: {
-    padding: 8,
+    borderRadius: 12,
   },
   headerTitle: {
     fontSize: 20,
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: '#333',
     textAlign: 'center',
     flex: 1,
+    marginLeft: 8,
   },
   headerIconContainer: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 12,
   },
   persistentAppbar: {
-    backgroundColor: '#1976D2',  
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
+    backgroundColor: '#FFFFFF',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
   },
-  formCard: {
-    marginTop: 15,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    overflow: 'hidden',
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    marginBottom: 20,
+  appbarTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
   },
   formContainer: {
-    padding: 16,
-    borderRadius: 16,
+    paddingVertical: 12,
+  },
+  sectionTitleContainer: {
+    marginBottom: 16,
+    marginTop: 4,
   },
   sectionTitle: {
     fontSize: 18,
-    marginBottom: 12,
     color: '#333',
+    letterSpacing: 0.2,
   },
   divider: {
     marginVertical: 16,
+    backgroundColor: '#E0E0E0',
+    height: 1,
+  },
+  inputGroup: {
+    gap: 12,
   },
   input: {
-    marginBottom: 12,
     backgroundColor: 'transparent',
   },
-  errorText: {
-    color: 'red',
-    marginBottom: 12,
+  switchSection: {
+    marginBottom: 16,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+  },
+  switchTextContainer: {
+    flex: 1,
+    paddingRight: 16,
   },
   switchLabel: {
     fontSize: 16,
+    marginBottom: 4,
+    color: '#333',
   },
   switchDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-    marginBottom: 16,
+    lineHeight: 18,
   },
 });
 

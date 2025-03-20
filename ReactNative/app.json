@@ -19,8 +19,10 @@
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": true,
         "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para escanear códigos QR",
-        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
-      }
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.anonymous.ReactNative"
     },
     "android": {
       "jsEngine": "hermes",
@@ -43,28 +45,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-barcode-scanner",
-        {
-          "cameraPermission": "Permitir a $(PRODUCT_NAME) acceder a la cámara para escanear códigos QR."
-        }
-      ],
-      [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "PORTRAIT"
-        }
-      ],
-      [
-        "expo-status-bar",
-        {
-          "style": "light"
-        }
-      ]
+      "expo-barcode-scanner",
+      "expo-screen-orientation"
     ],
     "extra": {
       "SUPABASE_URL": "https://uammxewwluoirsfdvfmu.supabase.co",
-      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI"
+      "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhbW14ZXd3bHVvaXJzZmR2Zm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4OTgxMzMsImV4cCI6MjA1NjQ3NDEzM30.SnxQvxrv0mAUze0cifJPCxDCHj4M_vvnrsM9DB967yI",
+      "eas": {
+        "projectId": "d80c596f-dd6b-4277-9130-70fd572ce73c"
+      }
     }
   }
 }
